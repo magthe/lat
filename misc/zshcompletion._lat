@@ -1,0 +1,39 @@
+#compdef lat
+
+# Zsh completion script for lat.  Stick it in $fpath with the name "_lat".
+
+emulate -LR zsh
+
+_lat() {
+    local curcontext="${curcontext}"
+
+    if (( CURRENT > 2 )); then
+        local cmd=${words[2]}
+        curcontext="${curcontext%:*:*}:lat-${cmd}:"
+
+        local args
+        args=()
+        ${words[1]} $cmd --help=simple|awk '/^O:/ { split( $0, a, ":"); print a[2], a[3], a[4]; }' \
+            | while read short long desc; do
+                args=($args "${short}[${desc}]" "${long%\[*\]}[${desc}]" )
+            done
+
+        (( CURRENT-- ))
+        shift words
+
+        _arguments -s : ${args}
+
+   else
+        # no command given yet, list commands and be done with it
+        local -a cmdlist
+
+        cmdlist=()
+        for cmd in $(${words[1]} --help=simple|awk '/^C:lat / { print $2 }'); do
+            cmdlist=( ${cmdlist} "$cmd" )
+        done
+
+        _describe -t lat-commands 'lat command' cmdlist
+    fi
+}
+
+_lat "$@"

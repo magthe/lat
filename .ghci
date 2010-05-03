@@ -1,0 +1,29 @@
+:set -isrc:dist/build/autogen
+
+-- useful when working with Types
+-- let distro1 = Distro Nothing "Name distro 1" Nothing
+:{
+:def defdistro1 const $ return $ unwords
+    [ "let distro1 = Distro"
+    , "Nothing"
+    , "\"Name distro 1\""
+    , "Nothing"
+    ]
+:}
+
+-- let alert1 = Alert Nothing ["No-url-1", "No-url-2"] "Id alert 1" "Pkg alert 1" (ModifiedJulianDay 1) False distro1
+:{
+:def defalert1 const $ return $ unwords
+    [ "let alert1 = Alert"
+    , "Nothing"
+    , "[\"No-url-1\", \"No-url-2\"]"
+    , "\"Id alert 1\""
+    , "\"Pkg alert 1\""
+    , "(ModifiedJulianDay 1)"
+    , "False"
+    , "distro1"
+    ]
+:}
+-- useful when working with AlertDB
+:def defrundb const $ return "let runDB = runAlertDB \"/home/magnus/.lat\""
+:def defrundbtest const $ return "let runDBTest = runAlertDB \".\""
