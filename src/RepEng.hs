@@ -18,16 +18,21 @@ module RepEng where
 
 import Control.Monad.Error
 import Control.Exception as CE
-import Data.ConfigFile
-import Data.Either.Utils
 import Data.Maybe
 import Network.XmlRpc.Client
 import Network.XmlRpc.Internals
 import System.Directory
 import System.FilePath
+import qualified Data.Ini as Ini
+import qualified Data.Ini.Reader as IniR
+
 
 import qualified AlertDB as ADB
 import qualified Types as T
+
+-- stuff that should be removed at some point, leftovers from use of MissingH
+fromRight (Right a) = a
+fromRight _ = error "RepEng.fromRight: Left!"
 
 -- assoc of backend name and function (taking path to database and the alert)
 type Engine = (String, FilePath -> T.Alert -> IO ())
@@ -35,14 +40,14 @@ type Engine = (String, FilePath -> T.Alert -> IO ())
 allEngines :: [Engine]
 allEngines = [ ("jira", _jiraReport)]
 
-_getConfigFile :: IO ConfigParser
-_getConfigFile = let
-        gCF h = runErrorT $ join $ liftIO $ readfile emptyCP (combine h "lat.conf")
-    in do
-        home <- getAppUserDataDirectory "lat"
-        conf <- CE.catch (gCF home) (\ e -> return $ Left (OtherProblem "IO Error", show (e :: CE.SomeException)))
-        -- TODO: add some better error handling here, or at least reporting to the user
-        return $ either (const emptyCP) id conf
+-- _getConfigFile :: IO Data.Ini.Types.Config
+_getConfigFile = do
+    home <- getAppUserDataDirectory "lat"
+    confStr <- readFile $ home </> "lat.conf"
+    let conf = IniR.parse confStr
+    case conf of
+        Left _ -> return Ini.emptyConfig
+        Right c -> return c
 
 data JiraConfig = JiraConfig
     { jiraURL :: String
@@ -54,7 +59,8 @@ data JiraConfig = JiraConfig
     , jiraComponent :: String
     } deriving (Show)
 
-_getWithDefault cfg section option def = either (const def) id (get cfg section option)
+-- _getWithDefault cfg section option def = either (const def) id (get cfg section option)
+_getWithDefault cfg section option def = maybe def id (Ini.getOption section option cfg)
 
 _getJiraConfig cfg = JiraConfig url user pwd project typ priority component
     where

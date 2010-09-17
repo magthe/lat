@@ -47,8 +47,8 @@ executable lat
         Types
     build-depends :
         base >=4 && <5, haskell98, safe, HDBC, HDBC-sqlite3, mtl, time,
-        directory, filepath, old-locale, regex-compat, tagsoup, ConfigFile,
-        haxr, MissingH, wl-pprint, cmdargs, HTTP
+        directory, filepath, old-locale, regex-compat, tagsoup,
+        haxr, wl-pprint, cmdargs, HTTP, hsini
     ghc-options :
         -Wall -fno-warn-missing-signatures -fno-warn-name-shadowing
         -fno-warn-orphans

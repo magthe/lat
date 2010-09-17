@@ -16,16 +16,14 @@
 
 module Filter where
 
-import qualified Types as T
-
-import Control.Monad.Error
-import Data.ConfigFile
-import Data.Either.Utils
 import Data.Maybe
 import System.Directory
 import System.FilePath
 import Text.Regex
-import qualified Control.Exception as CE
+import qualified Data.Ini as Ini
+import qualified Data.Ini.Reader as IniR
+
+import qualified Types as T
 
 filterAlerts :: [T.Alert] -> IO [T.Alert]
 filterAlerts as = do
@@ -44,20 +42,21 @@ _getFilters = let
 
     in do
         cfg <- _getConfigFile
-        if (not $ has_section cfg "packages")
+        if (not $ Ini.hasSection "packages" cfg)
             then return []
             else do
-                let is = forceEither $ items cfg "packages"
+                -- let is = forceEither $ items cfg "packages"
+                let is = Ini.allItems "packages" cfg
                 sequence $ map readRegexFile is
 
--- _getConfigFile :: IO ConfigParser
-_getConfigFile = let
-        gCF h = runErrorT $ join $ liftIO $ readfile emptyCP (h </> "lat.conf")
-    in do
-        home <- getAppUserDataDirectory "lat"
-        conf <- CE.catch (gCF home) (\ e -> return $ Left (OtherProblem "IO Error", show (e :: CE.SomeException)))
-        -- TODO: add some better error handling here, or at least reporting to the user
-        return $ either (const emptyCP) id conf
+-- _getConfigFile :: IO Data.Ini.Types.Config
+_getConfigFile = do
+    home <- getAppUserDataDirectory "lat"
+    confStr <- readFile $ home </> "lat.conf"
+    let conf = IniR.parse confStr
+    case conf of
+        Left _ -> return Ini.emptyConfig
+        Right c -> return c
 
 -- _doFilter :: [(String, [Regex])] -> [T.Alert] -> [T.Alert]
 _doFilter fs = filter (_isGoodalert fs)

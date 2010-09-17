@@ -30,10 +30,8 @@ import qualified Commands.ArgTypes as CAT
 -- {{{1 doCommand
 doCommand = do
     home <- getAppUserDataDirectory "lat"
-    let allArgs = map (\ f -> f home) [_distroAddArgs, _distroListArgs, _vulnUpdateArgs, _vulnListArgs, _vulnReportArgs]
-    let ver = "lat " ++ (showVersion version) ++ " - Linux Alert Tracker"
-            ++ "\nCopyright 2010 Magnus Therning <magnus@therning.org>"
-    cmdArgs ver allArgs >>= _doCommand
+    -- &= help "Linux Alert Tracker - track alerts on LWN.net" &= program "lat" &= summary ver
+    cmdArgs (_allCmds home) >>= _doCommand
 
 _doCommand a@(CAT.DistroAdd {}) = D.distroAdd a
 _doCommand a@(CAT.DistroList {}) = D.distroList a
@@ -42,39 +40,44 @@ _doCommand a@(CAT.VulnList {}) = V.vulnList a
 _doCommand a@(CAT.VulnReport {}) = V.vulnReport a
 
 -- {{{1 Command line arg definitions
-_configAttrib = text "Set dir for configuration" & empty "~/.lat" & typDir
+_allCmds h = modes cmds &= help "Linux Alert Tracker - track alerts on LWN.net" &= program "lat" &= summary ver
+    where
+        cmds = map (\ f -> f h) [_distroAddArgs, _distroListArgs, _vulnUpdateArgs, _vulnListArgs, _vulnReportArgs]
+        ver = "lat v" ++ (showVersion version) ++ " Copyright 2010 Magnus Therning <magnus@therning.org>"
 
-_distroAddArgs h = mode CAT.DistroAdd
-    { CAT.config = h &= _configAttrib
-    , CAT.name = def &= argPos 0 & typ "NAME"
-    , CAT.url = def &= argPos 1 & typ "URL"
-    } &= text "add a distribution"
+_configAttrib = help "Set dir for configuration" &= opt "~/.lat" &= typDir
 
-_distroListArgs h = mode CAT.DistroList
+_distroAddArgs h = CAT.DistroAdd
     { CAT.config = h &= _configAttrib
-    } &= text "list distributions"
+    , CAT.name = def &= argPos 0 &= typ "NAME"
+    , CAT.url = def &= argPos 1 &= typ "URL"
+    } &= help "add a distribution"
 
-_vulnUpdateArgs h = mode CAT.VulnUpdate
+_distroListArgs h = CAT.DistroList
     { CAT.config = h &= _configAttrib
-    , CAT.dry = def &= text "Dry run"
-    } &= text "update the vulnerability database"
+    } &= help "list distributions"
 
-_vulnListArgs h = mode CAT.VulnList
+_vulnUpdateArgs h = CAT.VulnUpdate
     { CAT.config = h &= _configAttrib
-    , CAT.typ = enum CAT.Unreported
-        [ CAT.Unreported &= text "List unreported issues (default)"
-        , CAT.Reported &= text "List reported issues"
-        , CAT.All &= text "List all issues"
+    , CAT.dry = def &= help "Dry run"
+    } &= help "update the vulnerability database"
+
+_vulnListArgs h = CAT.VulnList
+    { CAT.config = h &= _configAttrib
+    , CAT.typ = enum
+        [ CAT.Unreported &= help "List unreported issues (default)"
+        , CAT.Reported &= help "List reported issues"
+        , CAT.All &= help "List all issues"
         ]
-    , CAT.size = enum CAT.Normal
-        [ CAT.Small &= text "Output format: small"
-        , CAT.Normal &= text "Output format: normal" & flag "n"
-        , CAT.Full &= text "Output format: full"
+    , CAT.size = enum
+        [ CAT.Small &= help "Output format: small"
+        , CAT.Normal &= help "Output format: normal" &= name "n"
+        , CAT.Full &= help "Output format: full"
         ]
-    , CAT.nofilter = def &= text "Filter off" & explicit & flag "nofilter"
-    } &= text "list known vulnerabilities"
+    , CAT.nofilter = def &= help "Filter off" &= explicit &= name "nofilter"
+    } &= help "list known vulnerabilities"
 
-_vulnReportArgs h = mode CAT.VulnReport
+_vulnReportArgs h = CAT.VulnReport
     { CAT.config = h &= _configAttrib
-    , CAT.nofilter = def &= text "Filter off" & explicit & flag "nofilter"
-    } &= text "report (process) vulnerabilities"
+    , CAT.nofilter = def &= help "Filter off" &= explicit &= name "nofilter"
+    } &= help "report (process) vulnerabilities"
