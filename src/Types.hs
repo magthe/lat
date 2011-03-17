@@ -19,7 +19,7 @@ module Types where
 import Data.Maybe
 import Data.Time.Calendar
 --import Data.Time.Clock
-import Text.PrettyPrint.Leijen
+import Text.PrettyPrint.ANSI.Leijen
 
 data Distro = Distro
     { distroId :: Maybe Int     -- ^ DB ID, automatically populated by the DB
