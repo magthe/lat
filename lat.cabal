@@ -1,5 +1,5 @@
 name               : lat
-version            : 0.5
+version            : 0.5.999
 license            : GPL-3
 author             : Magnus Therning
 maintainer         : magnus@therning.org
@@ -46,9 +46,22 @@ executable lat
         Report
         Types
     build-depends :
-        base >=4 && <5, haskell98, safe, HDBC, HDBC-sqlite3, mtl, time,
-        directory, filepath, old-locale, regex-compat, tagsoup,
-        haxr, ansi-wl-pprint, cmdargs, HTTP, hsini
+        base ==4.3.*,
+        ansi-wl-pprint ==0.6.*,
+        time ==1.2.*,
+        hsini ==0.0.*,
+        regex-compat ==0.93.*,
+        filepath ==1.2.*,
+        directory ==1.1.*,
+        haskell98 ==1.1.*,
+        HDBC-sqlite3 ==2.3.*,
+        HDBC ==2.2.*,
+        mtl ==2.0.*,
+        haxr ==3000.8.*,
+        tagsoup ==0.12.*,
+        old-locale ==1.0.*,
+        HTTP ==4000.1.*,
+        cmdargs ==0.6.*
     ghc-options :
         -Wall -fno-warn-missing-signatures -fno-warn-name-shadowing
         -fno-warn-orphans
