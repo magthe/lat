@@ -49,7 +49,7 @@ executable lat
         base ==4.3.*,
         ansi-wl-pprint ==0.6.*,
         time ==1.2.*,
-        hsini ==0.0.*,
+        hsini ==0.1.*,
         regex-compat ==0.93.*,
         filepath ==1.2.*,
         directory ==1.1.*,
