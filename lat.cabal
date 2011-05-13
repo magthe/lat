@@ -1,5 +1,5 @@
 name               : lat
-version            : 0.5.999
+version            : 0.6
 license            : GPL-3
 author             : Magnus Therning
 maintainer         : magnus@therning.org
@@ -28,8 +28,8 @@ cabal-version      : >= 1.6
 extra-source-files : misc/zshcompletion._lat
 
 source-repository head
-    type     : darcs
-    location : http://patch-tag.com/r/magnus/lat
+    type     : git
+    location : https://github.com/magthe/lat.git
 
 executable lat
     hs-source-dirs : src
@@ -61,7 +61,7 @@ executable lat
         tagsoup ==0.12.*,
         old-locale ==1.0.*,
         HTTP ==4000.1.*,
-        cmdargs ==0.6.*
+        cmdargs ==0.7.*
     ghc-options :
         -Wall -fno-warn-missing-signatures -fno-warn-name-shadowing
         -fno-warn-orphans
